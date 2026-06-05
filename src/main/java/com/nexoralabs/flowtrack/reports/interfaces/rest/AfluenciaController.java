@@ -7,14 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/v1/afluencia")
+@CrossOrigin(origins = "*") // <-- Crucial para que el Front pueda leer los datos sin bloqueos de CORS
 public class AfluenciaController {
 
-    // Mapa para guardar la última detección por dispositivo_id
+    // 1. CORREGIDO: Cambiado a String para soportar los identificadores del Edge AI
     private final ConcurrentHashMap<String, Integer> cacheAfluencia = new ConcurrentHashMap<>();
 
-    // 1. ESCUCHADOR DE KAFKA
-    // Nota: Configura tu Kafka para usar JsonDeserializer en lugar de StringDeserializer
-    @KafkaListener(topics = "bodega.eventos.personas", groupId = "flowtrack-group")
+    // ESCUCHADOR DE KAFKA
+    @KafkaListener(topics = "bodega.eventos.personas", groupId = "flowtrack-group-v2") // <-- Asegúrate de usar el grupo v2 o superior
     public void recibirDeteccion(VisionDetectionDTO mensaje) {
         System.out.println("🚨 [DEBUG] ¡El listener de Kafka se ha activado!");
 
@@ -23,10 +23,12 @@ public class AfluenciaController {
             return;
         }
 
-        System.out.println("📦 [DEBUG] Mensaje recibido: " + mensaje.dispositivo_id);
+        System.out.println("📦 [DEBUG] Mensaje recibido del dispositivo: " + mensaje.dispositivo_id);
 
         if (mensaje.detecciones != null) {
             int conteo = mensaje.detecciones.getOrDefault("person", 0);
+
+            // Guardamos usando el String exacto (ej. "camara_0")
             cacheAfluencia.put(mensaje.dispositivo_id, conteo);
             System.out.println("✅ [DEBUG] Cache actualizado con: " + conteo + " personas para " + mensaje.dispositivo_id);
         } else {
@@ -34,9 +36,12 @@ public class AfluenciaController {
         }
     }
 
-    // 2. ENDPOINT PARA EL FRONTEND
+    // ENDPOINT PARA EL FRONTEND
     @GetMapping("/{idCamara}")
     public Integer obtenerAfluencia(@PathVariable String idCamara) {
-        return cacheAfluencia.getOrDefault(idCamara, 0);
+        // 2. CORREGIDO: Python envía los eventos con el prefijo "camara_" (ej: "camara_0")
+        // Construimos la misma clave para que el getOrDefault lo encuentre con éxito
+        String llaveBusqueda = "camara_" + idCamara;
+        return cacheAfluencia.getOrDefault(llaveBusqueda, 0);
     }
 }

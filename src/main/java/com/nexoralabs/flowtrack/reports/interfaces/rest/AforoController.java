@@ -53,7 +53,7 @@ public class AforoController {
             @ApiResponse(responseCode = "401", description = "No autorizado"),
             @ApiResponse(responseCode = "500", description = "Error al conectar con Edge Vision")
     })
-    public ResponseEntity<?> activarCamaraAforo(@PathVariable String idCamara) {
+    public ResponseEntity<?> activarCamaraAforo(@PathVariable int idCamara) {
         try {
             String urlDestino = pythonVisionStartUrl + "?camera_id=" + idCamara;
             ResponseEntity<VisionStreamResource> response =
