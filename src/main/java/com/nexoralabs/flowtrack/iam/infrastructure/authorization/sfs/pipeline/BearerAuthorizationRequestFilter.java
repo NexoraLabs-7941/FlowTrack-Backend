@@ -41,7 +41,6 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
 
         try {
             String token = tokenService.getBearerTokenFrom(request);
-
             if (token != null && tokenService.validateToken(token)) {
                 String email = tokenService.getEmailFromToken(token);
                 if (email != null) {
@@ -56,4 +55,5 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+}
 }

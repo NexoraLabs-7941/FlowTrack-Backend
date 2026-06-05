@@ -31,8 +31,7 @@ public class Category extends AuditableAbstractAggregateRoot<Category> {
 
     /**
      * @summary Constructor.
-     *          It creates a new Category instance based on the
-     *          CreateCategoryCommand command.
+     *          It creates a new Category instance based on the CreateCategoryCommand command.
      * @param command - the CreateCategoryCommand command
      */
     public Category(CreateCategoryCommand command) {

@@ -42,8 +42,7 @@ public class Batch extends AuditableAbstractAggregateRoot<Batch> {
      */
     public Batch(CreateBatchCommand command) {
 
-        if (command == null)
-            throw new IllegalArgumentException("CreateBatchCommand is required");
+        if (command == null) throw new IllegalArgumentException("CreateBatchCommand is required");
 
         if (command.productId() == null || command.productId() <= 0) {
             throw new IllegalArgumentException("productId cannot be null or less than or equal to 0");
@@ -64,8 +63,7 @@ public class Batch extends AuditableAbstractAggregateRoot<Batch> {
     }
 
     public void updateBatch(UpdateBatchCommand command) {
-        if (command == null)
-            throw new IllegalArgumentException("UpdateBatchCommand is required");
+        if (command == null) throw new IllegalArgumentException("UpdateBatchCommand is required");
 
         if (command.newQuantity() != 0) {
             if (command.newQuantity() < 0) {

@@ -32,3 +32,4 @@ public class UserQueryServiceImpl implements UserQueryService {
         return userRepository.findById(query.userId());
     }
 }
+

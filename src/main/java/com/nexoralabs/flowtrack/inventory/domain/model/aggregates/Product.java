@@ -50,8 +50,7 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
      */
     public Product(CreateProductCommand command) {
 
-        if (command == null)
-            throw new IllegalArgumentException("CreateProductCommand is required");
+        if (command == null) throw new IllegalArgumentException("CreateProductCommand is required");
 
         if (command.name() == null || command.name().isBlank()) {
             throw new IllegalArgumentException("Product name is required");
@@ -83,14 +82,12 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
 
     /**
      * Updates the product using an UpdateProductCommand.
-     * Only validated values from the command are applied; validation matches the
-     * command contract.
+     * Only validated values from the command are applied; validation matches the command contract.
      *
      * @param command the update command
      */
     public void updateProduct(UpdateProductCommand command) {
-        if (command == null)
-            throw new IllegalArgumentException("UpdateProductCommand is required");
+        if (command == null) throw new IllegalArgumentException("UpdateProductCommand is required");
 
         if (command.productId() == null || command.productId() <= 0) {
             throw new IllegalArgumentException("productId must be a positive number");

@@ -15,13 +15,10 @@ import org.apache.logging.log4j.util.Strings;
 
 /**
  * Provider aggregate root
- * 
  * @summary
- *          This aggregate root models a provider (supplier) with basic contact
- *          information and
- *          a Peruvian tax identifier (RUC). Value objects are used for email,
- *          phone number and RUC
- *          to centralize validation and formatting rules.
+ * This aggregate root models a provider (supplier) with basic contact information and
+ * a Peruvian tax identifier (RUC). Value objects are used for email, phone number and RUC
+ * to centralize validation and formatting rules.
  * @since 1.0
  */
 @Table(name = "providers")
@@ -58,8 +55,7 @@ public class Provider extends AuditableAbstractAggregateRoot<Provider> {
     /**
      * RUC as a value object.
      * The embedded attribute's single field is mapped to the 'ruc' column.
-     * Length 11 is enforced by the value object, but column length is declared for
-     * DDL generation.
+     * Length 11 is enforced by the value object, but column length is declared for DDL generation.
      */
     @Embedded
     @AttributeOverrides({
@@ -69,10 +65,8 @@ public class Provider extends AuditableAbstractAggregateRoot<Provider> {
 
     /**
      * Default constructor required by JPA.
-     * Keeps value object fields null so JPA can instantiate the aggregate. Domain
-     * factories
-     * / application services should use the command-based constructor to create a
-     * valid aggregate.
+     * Keeps value object fields null so JPA can instantiate the aggregate. Domain factories
+     * / application services should use the command-based constructor to create a valid aggregate.
      */
     public Provider() {
         super();
@@ -97,16 +91,16 @@ public class Provider extends AuditableAbstractAggregateRoot<Provider> {
         this.phoneNumber = new PhoneNumber(command.phoneNumber());
         this.ruc = new Ruc(command.ruc());
 
-        // Register created event (aggregate-level). The id may be null if not yet
-        // persisted.
+        // Register created event (aggregate-level). The id may be null if not yet persisted.
         this.addDomainEvent(new ProviderCreatedEvent(
                 this,
-                this.getId(), // might be null until entity is saved
+                this.getId(),            // might be null until entity is saved
                 this.firstName,
                 this.lastName,
                 this.phoneNumber != null ? this.phoneNumber.number() : null,
                 this.email != null ? this.email.address() : null,
-                this.ruc != null ? this.ruc.value() : null));
+                this.ruc != null ? this.ruc.value() : null
+        ));
     }
 
     /**
@@ -144,16 +138,15 @@ public class Provider extends AuditableAbstractAggregateRoot<Provider> {
                 this.lastName,
                 this.phoneNumber != null ? this.phoneNumber.number() : null,
                 this.email != null ? this.email.address() : null,
-                this.ruc != null ? this.ruc.value() : null));
+                this.ruc != null ? this.ruc.value() : null
+        ));
 
         return this;
     }
 
     /**
-     * Marks the provider as deleted logically in domain terms by registering a
-     * ProviderDeletedEvent.
-     * The actual removal from the database can be done by the application
-     * service/repository.
+      * Marks the provider as deleted logically in domain terms by registering a ProviderDeletedEvent.
+      * The actual removal from the database can be done by the application service/repository.
      *
      * @param reason optional reason for deletion (may be null)
      */
