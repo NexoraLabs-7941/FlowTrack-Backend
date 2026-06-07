@@ -1,4 +1,4 @@
-package com.nexoralabs.flowtrack.analytics.application.internal;
+package com.nexoralabs.flowtrack.reports.application.internal;
 
 import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Batch;
 import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Product;
@@ -6,8 +6,8 @@ import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetAllBatchesQuer
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetAllProductsQuery;
 import com.nexoralabs.flowtrack.inventory.domain.services.BatchQueryService;
 import com.nexoralabs.flowtrack.inventory.domain.services.ProductQueryService;
-import com.nexoralabs.flowtrack.analytics.application.DashboardService;
-import com.nexoralabs.flowtrack.analytics.interfaces.rest.resources.*;
+import com.nexoralabs.flowtrack.reports.application.DashboardService;
+import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.*;
 import com.nexoralabs.flowtrack.sales.domain.model.aggregates.Sale;
 import com.nexoralabs.flowtrack.sales.domain.model.queries.GetAllSalesQuery;
 import com.nexoralabs.flowtrack.sales.domain.services.SaleQueryService;

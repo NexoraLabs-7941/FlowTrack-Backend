@@ -1,6 +1,6 @@
-package com.nexoralabs.flowtrack.analytics.application;
+package com.nexoralabs.flowtrack.reports.application;
 
-import com.nexoralabs.flowtrack.analytics.interfaces.rest.resources.DashboardResource;
+import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.DashboardResource;
 
 /**
  * Service interface for dashboard operations.

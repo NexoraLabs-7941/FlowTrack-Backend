@@ -1,4 +1,4 @@
-package com.nexoralabs.flowtrack.analytics.interfaces.rest.resources;
+package com.nexoralabs.flowtrack.reports.interfaces.rest.resources;
 
 /**
  * Resource for product sales percentage.

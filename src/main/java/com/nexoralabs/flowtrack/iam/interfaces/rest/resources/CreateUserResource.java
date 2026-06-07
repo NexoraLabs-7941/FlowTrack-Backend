@@ -8,7 +8,7 @@ import java.util.List;
  * Permissions control access to specific modules.
  * @param email The email for the new user
  * @param password The password for the new user
- * @param permissions List of permission names (e.g., "dashboard_access", "inventory_access", "sales_access", "providers_access", "analytics_access", "user_management_access")
+ * @param permissions List of permission names (e.g., "dashboard_access", "inventory_access", "sales_access", "providers_access", "reports_access", "user_management_access")
  */
 public record CreateUserResource(String email, String password, List<String> permissions) {
 }

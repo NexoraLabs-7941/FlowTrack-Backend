@@ -9,7 +9,7 @@ public enum PermissionName {
     INVENTORY_ACCESS("inventory_access", "Access to inventory management"),
     SALES_ACCESS("sales_access", "Access to sales module"),
     PROVIDERS_ACCESS("providers_access", "Access to providers management"),
-    ANALYTICS_ACCESS("analytics_access", "Access to analytics"),
+    REPORTS_ACCESS("reports_access", "Access to reports"),
     USER_MANAGEMENT_ACCESS("user_management_access", "Access to user management");
 
     private final String name;

@@ -1,7 +1,7 @@
-package com.nexoralabs.flowtrack.analytics.interfaces.rest;
+package com.nexoralabs.flowtrack.reports.interfaces.rest;
 
-import com.nexoralabs.flowtrack.analytics.application.DashboardService;
-import com.nexoralabs.flowtrack.analytics.interfaces.rest.resources.DashboardResource;
+import com.nexoralabs.flowtrack.reports.application.DashboardService;
+import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.DashboardResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
