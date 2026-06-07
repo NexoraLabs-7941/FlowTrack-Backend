@@ -14,7 +14,7 @@ public class AfluenciaController {
     private final ConcurrentHashMap<String, Integer> cacheAfluencia = new ConcurrentHashMap<>();
 
     // ESCUCHADOR DE KAFKA
-    @KafkaListener(topics = "bodega.eventos.personas", groupId = "flowtrack-group-v2") // <-- Asegúrate de usar el grupo v2 o superior
+    @KafkaListener(topics = "flowtrack-detecciones-afluencia", groupId = "flowtrack-group") // <-- Asegúrate de usar el grupo v2 o superior
     public void recibirDeteccion(VisionDetectionDTO mensaje) {
         System.out.println("🚨 [DEBUG] ¡El listener de Kafka se ha activado!");
 
