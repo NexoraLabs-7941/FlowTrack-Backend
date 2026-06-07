@@ -13,11 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -53,9 +56,14 @@ public class AforoController {
             @ApiResponse(responseCode = "401", description = "No autorizado"),
             @ApiResponse(responseCode = "500", description = "Error al conectar con Edge Vision")
     })
-    public ResponseEntity<?> activarCamaraAforo(@PathVariable int idCamara) {
+    public ResponseEntity<?> activarCamaraAforo(
+            @PathVariable int idCamara,
+            @RequestParam(required = false) String cameraLabel) {
         try {
             String urlDestino = pythonVisionStartUrl + "?camera_id=" + idCamara;
+            if (cameraLabel != null && !cameraLabel.isBlank()) {
+                urlDestino += "&camera_label=" + URLEncoder.encode(cameraLabel, StandardCharsets.UTF_8);
+            }
             ResponseEntity<VisionStreamResource> response =
                     restTemplate.postForEntity(urlDestino, null, VisionStreamResource.class);
             return ResponseEntity.ok(response.getBody());
