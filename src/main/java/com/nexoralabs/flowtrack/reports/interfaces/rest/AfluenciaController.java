@@ -1,46 +1,43 @@
 package com.nexoralabs.flowtrack.reports.interfaces.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexoralabs.flowtrack.reports.infrastructure.dto.VisionDetectionDTO;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/v1/afluencia")
-@CrossOrigin(origins = "*") // <-- Crucial para que el Front pueda leer los datos sin bloqueos de CORS
+@CrossOrigin(origins = "*")
 public class AfluenciaController {
 
-    // 1. CORREGIDO: Cambiado a String para soportar los identificadores del Edge AI
+    private final ObjectMapper objectMapper;
     private final ConcurrentHashMap<String, Integer> cacheAfluencia = new ConcurrentHashMap<>();
 
-    // ESCUCHADOR DE KAFKA
-    @KafkaListener(topics = "flowtrack-detecciones-afluencia", groupId = "flowtrack-group") // <-- Asegúrate de usar el grupo v2 o superior
-    public void recibirDeteccion(VisionDetectionDTO mensaje) {
-        System.out.println("🚨 [DEBUG] ¡El listener de Kafka se ha activado!");
+    public AfluenciaController(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
-        if (mensaje == null) {
-            System.err.println("❌ [DEBUG] El mensaje recibido es NULO");
+    @KafkaListener(topics = "flowtrack-detecciones-afluencia", groupId = "flowtrack-group")
+    public void recibirDeteccion(String payload) throws JsonProcessingException {
+        VisionDetectionDTO mensaje = objectMapper.readValue(payload, VisionDetectionDTO.class);
+
+        if (mensaje == null || mensaje.detecciones == null) {
             return;
         }
 
-        System.out.println("📦 [DEBUG] Mensaje recibido del dispositivo: " + mensaje.dispositivo_id);
-
-        if (mensaje.detecciones != null) {
-            int conteo = mensaje.detecciones.getOrDefault("person", 0);
-
-            // Guardamos usando el String exacto (ej. "camara_0")
-            cacheAfluencia.put(mensaje.dispositivo_id, conteo);
-            System.out.println("✅ [DEBUG] Cache actualizado con: " + conteo + " personas para " + mensaje.dispositivo_id);
-        } else {
-            System.err.println("❌ [DEBUG] El campo 'detecciones' es nulo");
-        }
+        int conteo = mensaje.detecciones.getOrDefault("person", 0);
+        cacheAfluencia.put(mensaje.dispositivo_id, conteo);
     }
 
-    // ENDPOINT PARA EL FRONTEND
     @GetMapping("/{idCamara}")
     public Integer obtenerAfluencia(@PathVariable String idCamara) {
-        // 2. CORREGIDO: Python envía los eventos con el prefijo "camara_" (ej: "camara_0")
-        // Construimos la misma clave para que el getOrDefault lo encuentre con éxito
         String llaveBusqueda = "camara_" + idCamara;
         return cacheAfluencia.getOrDefault(llaveBusqueda, 0);
     }

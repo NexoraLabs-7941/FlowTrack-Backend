@@ -112,6 +112,8 @@ public class WebSecurityConfiguration {
                                 "/webjars/**",
                                 "/configuration/ui",
                                 "/configuration/security",
+                                "/ws-afluencia",
+                                "/ws-afluencia/**",
                                 "/error",
                                 "/favicon.ico"
                         ).permitAll()
