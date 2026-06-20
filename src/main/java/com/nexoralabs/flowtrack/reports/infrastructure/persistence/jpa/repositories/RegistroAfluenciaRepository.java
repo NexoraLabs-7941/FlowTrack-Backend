@@ -13,7 +13,7 @@ public interface RegistroAfluenciaRepository extends JpaRepository<RegistroAflue
             SELECT
                 TRIM(TO_CHAR(fecha_hora, 'Day')) AS periodo,
                 COALESCE(SUM(cantidad), 0) AS total
-            FROM registros_afluencia
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
             GROUP BY EXTRACT(ISODOW FROM fecha_hora), TRIM(TO_CHAR(fecha_hora, 'Day'))
             ORDER BY EXTRACT(ISODOW FROM fecha_hora)
@@ -24,7 +24,7 @@ public interface RegistroAfluenciaRepository extends JpaRepository<RegistroAflue
             SELECT
                 LPAD(CAST(EXTRACT(HOUR FROM fecha_hora) AS TEXT), 2, '0') || ':00' AS periodo,
                 COALESCE(SUM(cantidad), 0) AS total
-            FROM registros_afluencia
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
             GROUP BY EXTRACT(HOUR FROM fecha_hora)
             ORDER BY EXTRACT(HOUR FROM fecha_hora)
