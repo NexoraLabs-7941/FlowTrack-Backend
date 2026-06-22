@@ -26,8 +26,8 @@ public class AfluenciaEventConsumerService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @Transactional
-    @KafkaListener(topics = "afluencia_topic", groupId = "${spring.kafka.consumer.group-id:flowtrack-group}")
+//    @Transactional
+//    @KafkaListener(topics = "afluencia_topic", groupId = "${spring.kafka.consumer.group-id:flowtrack-group}")
     public void consumirEventoAfluencia(String payload) throws JsonProcessingException {
         AfluenciaKafkaEventDto evento = objectMapper.readValue(payload, AfluenciaKafkaEventDto.class);
 

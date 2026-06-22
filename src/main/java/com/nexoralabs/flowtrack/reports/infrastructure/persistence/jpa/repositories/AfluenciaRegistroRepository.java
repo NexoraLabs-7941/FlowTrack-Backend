@@ -25,13 +25,13 @@ public interface AfluenciaRegistroRepository extends JpaRepository<RegistroAflue
                     WHEN 6 THEN 'Domingo'
                 END AS diaSemana,
                 CAST(COALESCE(SUM(cantidad), 0) AS SIGNED) AS totalIngresos
-            FROM registros_afluencia
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
-              AND (:camaraId IS NULL OR camara_id = :camaraId)
+              AND (COALESCE(:camaraId, '') = '' OR camara_id = :camaraId)
               AND fecha_hora >= :fechaInicio
               AND fecha_hora < :fechaFinExclusive
-            GROUP BY DATE(fecha_hora), WEEKDAY(fecha_hora)
-            ORDER BY DATE(fecha_hora)
+            GROUP BY fecha, diaSemana
+            ORDER BY fecha
             """, nativeQuery = true)
     List<TraficoDiarioProjection> obtenerTraficoDiario(
             @Param("camaraId") String camaraId,
@@ -42,7 +42,7 @@ public interface AfluenciaRegistroRepository extends JpaRepository<RegistroAflue
             SELECT
                 HOUR(fecha_hora) AS hora,
                 CAST(COALESCE(SUM(cantidad), 0) AS SIGNED) AS totalIngresos
-            FROM registros_afluencia
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
               AND camara_id = :camaraId
               AND fecha_hora >= :inicioDia

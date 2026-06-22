@@ -11,23 +11,31 @@ public interface RegistroAfluenciaRepository extends JpaRepository<RegistroAflue
 
     @Query(value = """
             SELECT
-                TRIM(TO_CHAR(fecha_hora, 'Day')) AS periodo,
-                COALESCE(SUM(cantidad), 0) AS total
-            FROM registros_afluencia
+                CASE WEEKDAY(fecha_hora)
+                    WHEN 0 THEN 'Lunes'
+                    WHEN 1 THEN 'Martes'
+                    WHEN 2 THEN 'Miercoles'
+                    WHEN 3 THEN 'Jueves'
+                    WHEN 4 THEN 'Viernes'
+                    WHEN 5 THEN 'Sabado'
+                    WHEN 6 THEN 'Domingo'
+                END AS periodo,
+                CAST(COALESCE(SUM(cantidad), 0) AS SIGNED) AS total
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
-            GROUP BY EXTRACT(ISODOW FROM fecha_hora), TRIM(TO_CHAR(fecha_hora, 'Day'))
-            ORDER BY EXTRACT(ISODOW FROM fecha_hora)
+            GROUP BY WEEKDAY(fecha_hora)
+            ORDER BY WEEKDAY(fecha_hora)
             """, nativeQuery = true)
     List<AfluenciaAgrupadaProjection> obtenerTraficoDiario();
 
     @Query(value = """
             SELECT
-                LPAD(CAST(EXTRACT(HOUR FROM fecha_hora) AS TEXT), 2, '0') || ':00' AS periodo,
-                COALESCE(SUM(cantidad), 0) AS total
-            FROM registros_afluencia
+                CONCAT(LPAD(HOUR(fecha_hora), 2, '0'), ':00') AS periodo,
+                CAST(COALESCE(SUM(cantidad), 0) AS SIGNED) AS total
+            FROM registros_afluencias
             WHERE LOWER(tipo_movimiento) = 'ingreso'
-            GROUP BY EXTRACT(HOUR FROM fecha_hora)
-            ORDER BY EXTRACT(HOUR FROM fecha_hora)
+            GROUP BY HOUR(fecha_hora)
+            ORDER BY HOUR(fecha_hora)
             """, nativeQuery = true)
     List<AfluenciaAgrupadaProjection> obtenerHorasPico();
 }
