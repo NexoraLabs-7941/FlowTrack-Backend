@@ -79,4 +79,11 @@ public class RestockDetectionRecord extends AuditableAbstractAggregateRoot<Resto
         this.productId = productId;
         this.batchId = batchId;
     }
+
+    public void updateImageUrl(String newImageUrl) {
+        if (newImageUrl == null || newImageUrl.isBlank()) {
+            throw new IllegalArgumentException("imageUrl is required");
+        }
+        this.imageUrl = newImageUrl.trim();
+    }
 }

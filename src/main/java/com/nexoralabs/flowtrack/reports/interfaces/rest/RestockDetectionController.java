@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -152,5 +154,33 @@ public class RestockDetectionController {
     })
     public ResponseEntity<List<RestockDetectionRecordResource>> listarRegistros() {
         return ResponseEntity.ok(restockDetectionRecordService.getAllRecords());
+    }
+
+    @PatchMapping(value = "/deteccion/registros/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Actualizar foto de un registro YOLO",
+            description = "Reemplaza la URL de imagen de un registro existente. Envía una nueva imagen (se sube a Cloudinary) o una imageUrl directa."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Registro actualizado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "404", description = "Registro no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error al subir imagen o actualizar registro")
+    })
+    public ResponseEntity<?> actualizarFotoRegistro(
+            @PathVariable Long id,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl) {
+        try {
+            return restockDetectionRecordService.updateRecordImage(id, image, imageUrl)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "No se pudo actualizar el registro: " + e.getMessage()));
+        }
     }
 }

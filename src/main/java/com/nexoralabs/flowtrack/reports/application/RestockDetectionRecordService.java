@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestockDetectionRecordService {
@@ -77,5 +78,30 @@ public class RestockDetectionRecordService {
         return repository.findAllByOrderByCreatedAtDesc().stream()
                 .map(RestockDetectionRecordResource::fromEntity)
                 .toList();
+    }
+
+    @Transactional
+    public Optional<RestockDetectionRecordResource> updateRecordImage(
+            Long id,
+            MultipartFile image,
+            String imageUrl) throws IOException {
+
+        Optional<RestockDetectionRecord> recordOpt = repository.findById(id);
+        if (recordOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String newImageUrl;
+        if (image != null && !image.isEmpty()) {
+            newImageUrl = cloudinaryService.uploadImage(image);
+        } else if (imageUrl != null && !imageUrl.isBlank()) {
+            newImageUrl = imageUrl.trim();
+        } else {
+            throw new IllegalArgumentException("Debe enviar una imagen o una imageUrl.");
+        }
+
+        RestockDetectionRecord record = recordOpt.get();
+        record.updateImageUrl(newImageUrl);
+        return Optional.of(RestockDetectionRecordResource.fromEntity(repository.save(record)));
     }
 }
