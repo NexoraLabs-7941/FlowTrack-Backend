@@ -8,6 +8,7 @@ public record UpdateProductResource(
         String description,
         String categoryId,
         String providerId,
+        String barcode,
         Integer minStock,
         Double unitPrice,
         Boolean isActive

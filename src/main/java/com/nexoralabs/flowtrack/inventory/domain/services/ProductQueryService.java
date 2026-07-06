@@ -2,6 +2,7 @@ package com.nexoralabs.flowtrack.inventory.domain.services;
 
 import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Product;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetAllProductsQuery;
+import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByBarcodeQuery;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByIdQuery;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface ProductQueryService {
      * @return optional with found product
      */
     Optional<Product> handle(GetProductByIdQuery query);
+
+    Optional<Product> handle(GetProductByBarcodeQuery query);
 
     /**
      * Handle query to get all products.

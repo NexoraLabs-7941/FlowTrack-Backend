@@ -5,6 +5,7 @@ import com.nexoralabs.flowtrack.inventory.domain.exceptions.ProductNotFoundExcep
 import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Product;
 import com.nexoralabs.flowtrack.inventory.domain.model.commands.DeleteProductCommand;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetAllProductsQuery;
+import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByBarcodeQuery;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByIdQuery;
 import com.nexoralabs.flowtrack.inventory.domain.services.ProductCommandService;
 import com.nexoralabs.flowtrack.inventory.domain.services.ProductQueryService;
@@ -74,6 +75,23 @@ public class ProductController {
     public ResponseEntity<ProductResource> getById(@PathVariable Long id) {
         try {
             Optional<Product> opt = productQueryService.handle(new GetProductByIdQuery(id));
+            return opt.map(ProductResourceFromEntityAssembler::toResource)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Operation(summary = "Get product by barcode", description = "Fetch a product by its barcode")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product found"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
+    @GetMapping("/barcode/{barcode}")
+    public ResponseEntity<ProductResource> getByBarcode(@PathVariable String barcode) {
+        try {
+            Optional<Product> opt = productQueryService.handle(new GetProductByBarcodeQuery(barcode));
             return opt.map(ProductResourceFromEntityAssembler::toResource)
                     .map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.notFound().build());

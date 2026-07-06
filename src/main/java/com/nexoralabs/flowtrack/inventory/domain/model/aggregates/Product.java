@@ -34,6 +34,9 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
     @Column(nullable = false)
     private String providerId;
 
+    @Column(length = 100, unique = true)
+    private String barcode;
+
     @Column(nullable = false)
     private Integer minStock;
 
@@ -75,6 +78,7 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
         this.description = command.description() != null ? command.description().trim() : null;
         this.categoryId = command.categoryId().trim();
         this.providerId = command.providerId().trim();
+        this.barcode = normalizeOptional(command.barcode());
         this.minStock = command.minStock();
         this.unitPrice = command.unitPrice();
         this.isActive = command.isActive();
@@ -115,6 +119,7 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
         this.description = command.description() != null ? command.description().trim() : null;
         this.categoryId = command.categoryId().trim();
         this.providerId = command.providerId().trim();
+        this.barcode = normalizeOptional(command.barcode());
         this.minStock = command.minStock();
         this.unitPrice = command.unitPrice();
         this.isActive = command.isActive();
@@ -128,5 +133,12 @@ public class Product extends AuditableAbstractAggregateRoot<Product> {
      */
     private String normalize(String value) {
         return value == null ? Strings.EMPTY : value.trim();
+    }
+
+    private String normalizeOptional(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }

@@ -1,8 +1,10 @@
 package com.nexoralabs.flowtrack.reports.application.internal;
 
 import com.nexoralabs.flowtrack.reports.application.AfluenciaAnaliticaService;
+import com.nexoralabs.flowtrack.reports.infrastructure.persistence.jpa.projections.AfluenciaHistorialProjection;
 import com.nexoralabs.flowtrack.reports.infrastructure.persistence.jpa.projections.HorasPicoProjection;
 import com.nexoralabs.flowtrack.reports.infrastructure.persistence.jpa.repositories.AfluenciaRegistroRepository;
+import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.AfluenciaHistorialResource;
 import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.HorasPicoResource;
 import com.nexoralabs.flowtrack.reports.interfaces.rest.resources.TraficoDiarioResource;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,6 +30,11 @@ public class AfluenciaAnaliticaServiceImpl implements AfluenciaAnaliticaService 
 
     public AfluenciaAnaliticaServiceImpl(AfluenciaRegistroRepository afluenciaRegistroRepository) {
         this.afluenciaRegistroRepository = afluenciaRegistroRepository;
+    }
+
+    @Override
+    public List<String> obtenerCamarasDisponibles() {
+        return afluenciaRegistroRepository.obtenerCamarasDisponibles();
     }
 
     @Override
@@ -75,6 +83,41 @@ public class AfluenciaAnaliticaServiceImpl implements AfluenciaAnaliticaService 
                 .toList();
     }
 
+    @Override
+    public List<AfluenciaHistorialResource> obtenerHistorial(
+            String camaraId,
+            LocalDate fechaInicio,
+            LocalDate fechaFin) {
+        validarRangoFechas(fechaInicio, fechaFin);
+
+        LocalDateTime inicio = (fechaInicio != null ? fechaInicio : FECHA_INICIO_HISTORICA).atStartOfDay();
+        LocalDateTime finExclusive = (fechaFin != null ? fechaFin : FECHA_FIN_HISTORICA).plusDays(1).atStartOfDay();
+        String camaraIdNormalizada = normalizarCamaraId(camaraId);
+
+        return afluenciaRegistroRepository.obtenerHistorialAgrupadoPorHora(camaraIdNormalizada, inicio, finExclusive)
+                .stream()
+                .map(this::toHistorialResource)
+                .toList();
+    }
+
+    @Override
+    public byte[] exportarHistorialCsv(
+            String camaraId,
+            LocalDate fechaInicio,
+            LocalDate fechaFin) {
+        List<AfluenciaHistorialResource> registros = obtenerHistorial(camaraId, fechaInicio, fechaFin);
+        StringBuilder csv = new StringBuilder("fecha,diaSemana,horaInicio,horaFin,rangoHora,camaraId,totalIngresos\n");
+        registros.forEach(registro -> csv
+                .append(escapeCsv(registro.fecha())).append(',')
+                .append(escapeCsv(registro.diaSemana())).append(',')
+                .append(escapeCsv(registro.horaInicio())).append(',')
+                .append(escapeCsv(registro.horaFin())).append(',')
+                .append(escapeCsv(registro.rangoHora())).append(',')
+                .append(escapeCsv(registro.camaraId())).append(',')
+                .append(registro.totalIngresos()).append('\n'));
+        return csv.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
     private void validarRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
         if (fechaInicio != null && fechaFin != null && fechaInicio.isAfter(fechaFin)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fechaInicio no puede ser posterior a fechaFin");
@@ -96,5 +139,36 @@ public class AfluenciaAnaliticaServiceImpl implements AfluenciaAnaliticaService 
         }
 
         return camaraIdNormalizado;
+    }
+
+    private AfluenciaHistorialResource toHistorialResource(AfluenciaHistorialProjection registro) {
+        Integer hora = registro.getHora();
+        String horaInicio = formatearHora(hora);
+        String horaFin = formatearHora((hora + 1) % 24);
+        return new AfluenciaHistorialResource(
+                registro.getFecha(),
+                registro.getDiaSemana(),
+                hora,
+                horaInicio,
+                horaFin,
+                horaInicio + " - " + horaFin,
+                registro.getCamaraId(),
+                registro.getTotalIngresos()
+        );
+    }
+
+    private String formatearHora(Integer hora) {
+        return String.format("%02d:00", hora);
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) {
+            return "";
+        }
+        String escaped = value.replace("\"", "\"\"");
+        if (escaped.contains(",") || escaped.contains("\n") || escaped.contains("\"")) {
+            return "\"" + escaped + "\"";
+        }
+        return escaped;
     }
 }

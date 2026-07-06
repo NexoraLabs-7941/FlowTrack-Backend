@@ -18,14 +18,11 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Configuration class to initialize the Google Sheets and Drive API clients.
- * Uses the same service account credentials configured for Firebase.
- */
 @Configuration
 public class GoogleSheetsConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(GoogleSheetsConfig.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(GoogleSheetsConfig.class);
 
     private final ResourceLoader resourceLoader;
 
@@ -38,49 +35,75 @@ public class GoogleSheetsConfig {
 
     private GoogleCredentials getCredentials() throws Exception {
         Resource resource = resourceLoader.getResource(configPath);
+
         if (!resource.exists()) {
-            throw new IllegalStateException("Google service account credentials file not found at " + configPath);
+            throw new IllegalStateException(
+                    "Google service account credentials file not found at: "
+                            + configPath
+            );
         }
-        try (InputStream in = resource.getInputStream()) {
-            List<String> scopes = Arrays.asList(
+
+        List<String> scopes = Arrays.asList(
                 "https://www.googleapis.com/auth/spreadsheets",
                 "https://www.googleapis.com/auth/drive"
-            );
-            return GoogleCredentials.fromStream(in).createScoped(scopes);
+        );
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            return GoogleCredentials
+                    .fromStream(inputStream)
+                    .createScoped(scopes);
         }
     }
 
     @Bean
     public Sheets googleSheets() {
         try {
-            log.info("Initializing Google Sheets service bean using credentials path: {}", configPath);
+            log.info(
+                    "Initializing Google Sheets using credentials path: {}",
+                    configPath
+            );
+
             GoogleCredentials credentials = getCredentials();
+
             return new Sheets.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                new HttpCredentialsAdapter(credentials))
-                .setApplicationName("Flowtrack")
-                .build();
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    new HttpCredentialsAdapter(credentials)
+            )
+                    .setApplicationName("Flowtrack")
+                    .build();
+
         } catch (Exception e) {
-            log.error("Failed to initialize Google Sheets service. Sheets integration will not function.", e);
-            return null;
+            throw new IllegalStateException(
+                    "Could not initialize Google Sheets using: " + configPath,
+                    e
+            );
         }
     }
 
     @Bean
     public Drive googleDrive() {
         try {
-            log.info("Initializing Google Drive service bean using credentials path: {}", configPath);
+            log.info(
+                    "Initializing Google Drive using credentials path: {}",
+                    configPath
+            );
+
             GoogleCredentials credentials = getCredentials();
+
             return new Drive.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                new HttpCredentialsAdapter(credentials))
-                .setApplicationName("Flowtrack")
-                .build();
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    new HttpCredentialsAdapter(credentials)
+            )
+                    .setApplicationName("Flowtrack")
+                    .build();
+
         } catch (Exception e) {
-            log.error("Failed to initialize Google Drive service. Drive integration will not function.", e);
-            return null;
+            throw new IllegalStateException(
+                    "Could not initialize Google Drive using: " + configPath,
+                    e
+            );
         }
     }
 }

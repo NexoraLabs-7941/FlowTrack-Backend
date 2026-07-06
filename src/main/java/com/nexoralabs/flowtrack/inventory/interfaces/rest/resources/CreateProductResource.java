@@ -8,6 +8,7 @@ package com.nexoralabs.flowtrack.inventory.interfaces.rest.resources;
  * @param description product description (optional)
  * @param categoryId category id (required)
  * @param providerId provider id (required)
+ * @param barcode    product barcode (optional)
  * @param minStock   minimum stock quantity to trigger alert (required)
  * @param unitPrice  price per unit (required)
  * @param isActive   product active status (required)
@@ -17,6 +18,7 @@ public record CreateProductResource(
         String description,
         String categoryId,
         String providerId,
+        String barcode,
         Integer minStock,
         Double unitPrice,
         Boolean isActive

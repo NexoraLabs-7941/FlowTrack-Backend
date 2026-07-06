@@ -27,6 +27,7 @@ public class CreateProductCommandFromResourceAssembler {
                 resource.description(),
                 resource.categoryId(),
                 resource.providerId(),
+                resource.barcode(),
                 resource.minStock(),
                 resource.unitPrice(),
                 resource.isActive()

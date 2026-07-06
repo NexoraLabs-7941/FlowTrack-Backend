@@ -4,6 +4,8 @@ import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository interface for Product aggregate.
  * Provides basic CRUD operations and additional query methods if needed.
@@ -19,4 +21,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      */
     boolean existsByNameAndProviderId(String name, String providerId);
 
+    boolean existsByBarcode(String barcode);
+
+    boolean existsByBarcodeAndIdNot(String barcode, Long id);
+
+    Optional<Product> findByBarcode(String barcode);
 }

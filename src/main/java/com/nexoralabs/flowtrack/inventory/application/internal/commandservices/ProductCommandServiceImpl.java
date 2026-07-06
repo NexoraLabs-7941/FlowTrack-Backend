@@ -69,6 +69,10 @@ public class ProductCommandServiceImpl implements ProductCommandService {
         if (productRepository.existsByNameAndProviderId(command.name(), command.providerId())) {
             throw new ProductAlreadyExistsException(command.name());
         }
+        String barcode = normalizeBarcode(command.barcode());
+        if (barcode != null && productRepository.existsByBarcode(barcode)) {
+            throw new IllegalArgumentException("Product with barcode '%s' already exists".formatted(barcode));
+        }
 
         Product product = new Product(command);
 
@@ -116,6 +120,10 @@ public class ProductCommandServiceImpl implements ProductCommandService {
         if (!providerRepository.existsById(providerId)) {
             throw new ProviderNotFoundException(providerId);
         }
+        String barcode = normalizeBarcode(command.barcode());
+        if (barcode != null && productRepository.existsByBarcodeAndIdNot(barcode, command.productId())) {
+            throw new IllegalArgumentException("Product with barcode '%s' already exists".formatted(barcode));
+        }
 
         product.updateProduct(command);
 
@@ -159,5 +167,12 @@ public class ProductCommandServiceImpl implements ProductCommandService {
             throw new RuntimeException("Error deleting product: " +
                     (ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage()));
         }
+    }
+
+    private String normalizeBarcode(String barcode) {
+        if (barcode == null || barcode.isBlank()) {
+            return null;
+        }
+        return barcode.trim();
     }
 }

@@ -24,6 +24,7 @@ public class ProductResourceFromEntityAssembler {
                 product.getDescription(),
                 product.getCategoryId(),
                 product.getProviderId(),
+                product.getBarcode(),
                 product.getMinStock(),
                 product.getUnitPrice(),
                 product.getIsActive()

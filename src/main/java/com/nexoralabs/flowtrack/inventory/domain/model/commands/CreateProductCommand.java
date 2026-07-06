@@ -7,6 +7,7 @@ package com.nexoralabs.flowtrack.inventory.domain.model.commands;
  * @param description the product description. Can be null or blank.
  * @param categoryId the category id. Cannot be null or blank.
  * @param providerId the provider id. Cannot be null or blank.
+ * @param barcode    the product barcode. Can be null or blank.
  * @param minStock   the minimum stock threshold (alert level). Cannot be null or negative.
  * @param unitPrice  the unit price. Cannot be null and must be greater than 0.
  * @param isActive   whether the product is active (available). Cannot be null.
@@ -17,6 +18,7 @@ public record CreateProductCommand(
         String description,
         String categoryId,
         String providerId,
+        String barcode,
         Integer minStock,
         Double unitPrice,
         Boolean isActive

@@ -2,6 +2,7 @@ package com.nexoralabs.flowtrack.inventory.application.internal.queryservices;
 
 import com.nexoralabs.flowtrack.inventory.domain.model.aggregates.Product;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetAllProductsQuery;
+import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByBarcodeQuery;
 import com.nexoralabs.flowtrack.inventory.domain.model.queries.GetProductByIdQuery;
 import com.nexoralabs.flowtrack.inventory.domain.services.ProductQueryService;
 import com.nexoralabs.flowtrack.inventory.infrastructure.persistence.jpa.repositories.ProductRepository;
@@ -34,6 +35,11 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     @Override
     public Optional<Product> handle(GetProductByIdQuery query) {
         return productRepository.findById(query.productId());
+    }
+
+    @Override
+    public Optional<Product> handle(GetProductByBarcodeQuery query) {
+        return productRepository.findByBarcode(query.barcode().trim());
     }
 
     /**
